@@ -84,5 +84,8 @@ repo init -u git@git.ecarxgroup.com:jica/adcu/bsw/bsw_soc/plat_l/bsw_reporoot.gi
 # 本地同步
 repo init -u . -b dev_gerrit -m pas_test.xml
 repo sync -j8
+
+# 全项目一键安装 hook：
+repo forall -c 'scp -p -P 29418 zuowei.wang@gerrit.ecarxgroup.com:hooks/commit-msg .git/hooks/'
 ```
 
