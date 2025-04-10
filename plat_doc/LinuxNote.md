@@ -271,5 +271,28 @@ install zinstall:
 ...
 ```
 
+### rootfs
+
+设置默认密码
+
+```shell
+# 生成加密密码
+openssl passwd -6 'root'
+# 将生成的密码写入文件
+etc/shadow
+
+# e.g.
+openssl passwd -6 'root'
+# 生成密码如：
+$6$K4Dc3g76W.fZjKLO$bf3o5l7AeWnT...UHRNHs9goOxUyxNN9
+vim etc/shadow
+# 找到如下内容，一般是第一行
+root:$6$fBKXLhCmHSVDE7Kp$kTtcoQoE6KPw28GI3Xt5p8ZuFIVM/xQ8wzIqPToxVrLDeJDyuEeARu61yiQ6.IQr5f4ixfbtlg3YgQ4n6lYKd0:20084:0:99999:7:::
+# 修改为
+root:$6$K4Dc3g76W.fZjKLO$bf3o5l7AeWnT...UHRNHs9goOxUyxNN9:20084:0:99999:7:::
+# 取消登录密码
+root::20084:0:99999:7:::
+```
+
 
 

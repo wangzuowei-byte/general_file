@@ -17,3 +17,19 @@ TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -L)"
 dd if=EMMC_SOCA.img | ssh -o "StrictHostKeyChecking=no" -o "HostkeyAlgorithms=+ssh-rsa" root@172.20.30.8 dd of=/dev/mmcblk0
 ```
 
+## 取消密码登录
+
+```shell
+# 启动脚本中加
+passwd -d root
+```
+
+## 远程SSH Root
+
+vim /etc/ssh/sshd_config
+
+```shell
+PermitRootLogin yes
+PermitEmptyPasswords yes
+```
+
