@@ -13,6 +13,21 @@ TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -P)"
 TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -L)"
 ```
 
+mount
+
+```shell
+# 挂载ext4
+mount xxx.img path/
+# 挂载qnx系统镜像
+mount -t qnx6 -o loop xxx.img path/
+# linux 热挂载可读写
+mount -o remount,rw path/
+# qnx 热挂载可读写
+mount -uw path/
+```
+
+
+
 ## 系统服务
 
 ### Systemd
@@ -21,7 +36,35 @@ TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -L)"
 
 ```shell
 dmesg |grep systemd
+# 查看服务状态如ssh
+systemctl ststus ssh
+# 查看服务日志
+journalctl -xeu ssh.servicesys
+systemctl start ssh
+systemctl stop ssh
+systemctl restart ssh
 ```
+
+### net-tools
+
+查看端口占用
+
+```shell
+# linux
+netstat -tulnp | grep :22
+-> tcp   0   0 0.0.0.0:22   0.0.0.0:*   LISTEN   1234/sshd
+
+ss -tuln | grep :22
+lsof -i :22
+-> sshd     1234   root   3u  IPv4  123456  TCP *:ssh (LISTEN)
+fuser -n tcp 22
+
+# qnx
+sin net | grep 22
+pidin net | grep 22
+```
+
+
 
 ## 编译构建
 
