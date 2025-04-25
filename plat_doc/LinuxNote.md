@@ -77,6 +77,11 @@ minicom -D /dev/ttyUSB0 -b 115200
 stty -F /dev/ttySTM1 115200 cs8 -cstopb -parenb
 # 关闭回显示缓冲直接显示原始数据
 stty -F /dev/ttySTM3 9600 cs8 -cstopb -parenb  raw -echo
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -ixon -ixoff raw -echo
+# 纯数据通信（推荐）
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -crtscts -ixon -ixoff raw -echo
+# 终端交互调试
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -crtscts -ixon -ixoff -echo
 
 # 发送数据到串口
 echo -n "Hello" > /dev/ttySTM2
@@ -92,7 +97,13 @@ cat /sys/kernel/debug/pinctrl/*/pinmux-pins | grep 12
 devmem 0x40011000
 ```
 
-
+cs8	数据位 8 bits
+-parenb	禁用奇偶校验（No Parity）
+-cstopb	1 位停止位（如果设为 cstopb 则是 2 位停止位）
+-ixon	禁用 输入（接收）软件流控（XON/XOFF）
+-ixoff	禁用 输出（发送）软件流控（XON/XOFF）
+raw	原始模式（禁用终端处理，直接传递原始数据，不解释特殊字符如 ^C）
+-echo	禁用回显（不把接收到的数据回显到终端）
 
 ## 编译构建
 
