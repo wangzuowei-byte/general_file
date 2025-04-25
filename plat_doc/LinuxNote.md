@@ -66,6 +66,34 @@ pidin net | grep 22
 
 
 
+## DEV
+
+### uart
+
+```shell
+# 打开minicom
+minicom -D /dev/ttyUSB0 -b 115200
+
+stty -F /dev/ttySTM1 115200 cs8 -cstopb -parenb
+# 关闭回显示缓冲直接显示原始数据
+stty -F /dev/ttySTM3 9600 cs8 -cstopb -parenb  raw -echo
+
+# 发送数据到串口
+echo -n "Hello" > /dev/ttySTM2
+# 读取串口
+cat /dev/ttySTM2 | hexdump -C
+cat /dev/ttySTM2
+
+# 查看设备信息
+dmesg | grep ttySTM2
+dmesg | grep pinctrl
+cat /sys/kernel/debug/pinctrl/*/pins | grep PB1
+cat /sys/kernel/debug/pinctrl/*/pinmux-pins | grep 12
+devmem 0x40011000
+```
+
+
+
 ## 编译构建
 
 ### defconfog
