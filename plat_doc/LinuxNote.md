@@ -13,6 +13,21 @@ TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -P)"
 TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -L)"
 ```
 
+mount
+
+```shell
+# 挂载ext4
+mount xxx.img path/
+# 挂载qnx系统镜像
+mount -t qnx6 -o loop xxx.img path/
+# linux 热挂载可读写
+mount -o remount,rw path/
+# qnx 热挂载可读写
+mount -uw path/
+```
+
+
+
 ## 系统服务
 
 ### Systemd
@@ -21,7 +36,74 @@ TOOLCHAIN_PATH="$(cd "$(dirname "$0")" && pwd -L)"
 
 ```shell
 dmesg |grep systemd
+# 查看服务状态如ssh
+systemctl ststus ssh
+# 查看服务日志
+journalctl -xeu ssh.servicesys
+systemctl start ssh
+systemctl stop ssh
+systemctl restart ssh
 ```
+
+### net-tools
+
+查看端口占用
+
+```shell
+# linux
+netstat -tulnp | grep :22
+-> tcp   0   0 0.0.0.0:22   0.0.0.0:*   LISTEN   1234/sshd
+
+ss -tuln | grep :22
+lsof -i :22
+-> sshd     1234   root   3u  IPv4  123456  TCP *:ssh (LISTEN)
+fuser -n tcp 22
+
+# qnx
+sin net | grep 22
+pidin net | grep 22
+```
+
+
+
+## DEV
+
+### uart
+
+```shell
+# 打开minicom
+minicom -D /dev/ttyUSB0 -b 115200
+
+stty -F /dev/ttySTM1 115200 cs8 -cstopb -parenb
+# 关闭回显示缓冲直接显示原始数据
+stty -F /dev/ttySTM3 9600 cs8 -cstopb -parenb  raw -echo
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -ixon -ixoff raw -echo
+# 纯数据通信（推荐）
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -crtscts -ixon -ixoff raw -echo
+# 终端交互调试
+stty -F /dev/ttymxc4 115200 cs8 -parenb -cstopb -crtscts -ixon -ixoff -echo
+
+# 发送数据到串口
+echo -n "Hello" > /dev/ttySTM2
+# 读取串口
+cat /dev/ttySTM2 | hexdump -C
+cat /dev/ttySTM2
+
+# 查看设备信息
+dmesg | grep ttySTM2
+dmesg | grep pinctrl
+cat /sys/kernel/debug/pinctrl/*/pins | grep PB1
+cat /sys/kernel/debug/pinctrl/*/pinmux-pins | grep 12
+devmem 0x40011000
+```
+
+cs8	数据位 8 bits
+-parenb	禁用奇偶校验（No Parity）
+-cstopb	1 位停止位（如果设为 cstopb 则是 2 位停止位）
+-ixon	禁用 输入（接收）软件流控（XON/XOFF）
+-ixoff	禁用 输出（发送）软件流控（XON/XOFF）
+raw	原始模式（禁用终端处理，直接传递原始数据，不解释特殊字符如 ^C）
+-echo	禁用回显（不把接收到的数据回显到终端）
 
 ## 编译构建
 

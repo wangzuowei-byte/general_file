@@ -24,3 +24,39 @@ target_link_libraries(ApMonitor PRIVATE -L${CMAKE_BINARY_DIR}/frrt_package/frrt 
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath-link,${CMAKE_BINARY_DIR}/frrt_package/frrt/")
 ```
 
+## 动态库连接追溯
+
+### 查看动态库
+
+```shell
+readelf -d MonitorTool
+# 查看所有 CMakeLists 文件中出现 spdlog 信息的地方
+grep -nr --include=CMakeLists.txt spdlog .
+```
+
+### 通过日志查看连接过程
+
+```shell
+# 安装工具
+apt-get install strace
+
+# CMAKE 生成日志
+strace -f -e trace=file -o cmake.strace.log cmake ..
+# MAKE 生成日志
+# strace -f -e trace=file -o make.strace.log make VERBOSE=1 -j8
+strace -f -e trace=file -o make.strace.log make -j8
+
+# 查看可执行文件 需要平台匹配
+strace -f -e trace=file ./MonitorTool
+
+# 查看cmake阶段某个库的连接信息
+grep libspdlog.so cmake.strace.log
+# 查看make阶段某个库的连接信息
+grep libspdlog.so make.strace.log
+
+# 查看所有库信息
+grep '\.so' cmake.strace.log | sort | uniq
+grep '\.so' make.strace.log | sort | uniq
+
+```
+
